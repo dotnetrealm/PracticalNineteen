@@ -1,0 +1,29 @@
+﻿@model PracticalNineteen.Domain.DTO.UserCredential;
+@{
+    ViewBag.Title = "Login";
+}
+<div class="row d-flex justify-content-center align-items-center loginForm">
+    <form asp-controller="Account" asp-action="Login" method="post" class="col-6">
+        <h1 class="my-3">Login</h1>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <div class="mb-3">
+            <label asp-for="UserName" class="form-label required"></label>
+            <input type="text" class="form-control" asp-for="UserName">
+            <span class="text-danger" asp-validation-for="UserName"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label required">Password</label>
+            <input type="password" class="form-control" asp-for="Password">
+            <span class="text-danger" asp-validation-for="Password"></span>
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" asp-for="RememberMe">
+            <label class="form-check-label" asp-for="RememberMe"></label>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+        <div class="d-flex align-items-baseline">
+            <h6>Not registered yet?</h6>
+            <a class="btn btn-link" asp-controller="Account" asp-action="Register">Register Now!!</a>
+        </div>
+    </form>
+</div>
