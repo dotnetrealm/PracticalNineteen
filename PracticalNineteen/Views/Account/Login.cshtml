@@ -1,4 +1,4 @@
-﻿@model PracticalNineteen.Domain.DTO.UserCredential;
+﻿@model PracticalNineteen.Domain.DTO.CredentialModel;
 @{
     ViewBag.Title = "Login";
 }
@@ -7,9 +7,9 @@
         <h1 class="my-3">Login</h1>
         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
         <div class="mb-3">
-            <label asp-for="UserName" class="form-label required"></label>
-            <input type="text" class="form-control" asp-for="UserName">
-            <span class="text-danger" asp-validation-for="UserName"></span>
+            <label asp-for="Email" class="form-label required"></label>
+            <input type="text" class="form-control" asp-for="Email">
+            <span class="text-danger" asp-validation-for="Email"></span>
         </div>
         <div class="mb-3">
             <label asp-for="Password" class="form-label required">Password</label>

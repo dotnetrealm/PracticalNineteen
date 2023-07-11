@@ -1,88 +1,66 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PracticalNineteen.Domain.DTO;
 using PracticalNineteen.Domain.Entities;
-using PracticalNineteen.Domain.Interfaces;
 
 namespace PracticalNineteen.Controllers
 {
     public class AccountController : Controller
     {
-        readonly IAccountRepository _accountRepository;
-        readonly SignInManager<UserIdentityModel> _signInManager;
-        readonly IMapper _mapper;
-
-        public AccountController(IAccountRepository accountRepository, SignInManager<UserIdentityModel> signInManager, IMapper mapper)
+        readonly HttpClient _httpClient;
+        public AccountController(IHttpClientFactory httpClientFactory)
         {
-            _accountRepository = accountRepository;
-            _signInManager = signInManager;
-            _mapper = mapper;
+            _httpClient = httpClientFactory.CreateClient("apiController");
         }
         [HttpGet]
         public IActionResult Register()
         {
-            return View(new UserModel());
+            return View(new UserRegistrationModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegisterAsync(UserModel user)
+        public async Task<IActionResult> RegisterAsync(UserIdentity user)
         {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    var isSucceeded = await _accountRepository.RegisterUserAsync(user);
-                    if (isSucceeded)
-                    {
-                        await _signInManager.SignInAsync(_mapper.Map<UserIdentityModel>(user), false);
-                        TempData["UserName"] = user.UserName;
-                        return RedirectToAction("Index", "Home");
-                    }
-                }
-                return View(user);
-            }
-            catch (Exception ex)
-            {
-                Console.Write(ex.Message);
-                return View(user);
-            }
+            var token =await _httpClient.PostAsJsonAsync("Identity/Register", user);
+            if (token is not null)
+                return Redirect("/Student/Index");
+            ModelState.AddModelError(String.Empty, "Invalid Credentials");
+            return View(user);
         }
 
-        [HttpGet]
-        public IActionResult Login()
-        {
-            if (_signInManager.IsSignedIn(User))
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            return View(new UserCredential());
-        }
+        //[HttpGet]
+        //public IActionResult Login()
+        //{
+        //    if (_signInManager.IsSignedIn(User))
+        //    {
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //    return View(new CredentialModel());
+        //}
 
-        [HttpPost]
-        public async Task<IActionResult> Login(UserCredential creds)
-        {
-            if (ModelState.IsValid)
-            {
-                var res = await _signInManager.PasswordSignInAsync(creds.UserName, creds.Password, creds.RememberMe, false);
+        //[HttpPost]
+        //public async Task<IActionResult> Login(CredentialModel creds)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        var res = await _signInManager.PasswordSignInAsync(creds.Email, creds.Password, creds.RememberMe, false);
 
-                if (res.Succeeded)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid UserName/Password.");
-                    return View(creds);
-                }
-            }
-            return View(creds);
-        }
+        //        if (res.Succeeded)
+        //        {
+        //            return RedirectToAction("Index", "Home");
+        //        }
+        //        else
+        //        {
+        //            ModelState.AddModelError(string.Empty, "Invalid UserName/Password.");
+        //            return View(creds);
+        //        }
+        //    }
+        //    return View(creds);
+        //}
 
-        public async Task<IActionResult> LogoutAsync()
-        {
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Login", "Account");
-        }
+        //public async Task<IActionResult> LogoutAsync()
+        //{
+        //    await _signInManager.SignOutAsync();
+        //    return RedirectToAction("Login", "Account");
+        //}
     }
 }

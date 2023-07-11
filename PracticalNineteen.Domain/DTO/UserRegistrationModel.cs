@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PracticalNineteen.Domain.DTO
 {
-    public class UserModel
+    public class UserRegistrationModel
     {
-        //public string? Id { get; set; }
-         
         [Required]
         [StringLength(50, ErrorMessage = "First Name must be less than or equals to 50 characters.")]
         [DisplayName("First Name")]
@@ -18,11 +16,6 @@ namespace PracticalNineteen.Domain.DTO
         public string LastName { get; set; } = null!;
 
         [Required]
-        [StringLength(256, ErrorMessage = "User Name must be less than or equals to 256 characters.")]
-        [DisplayName("User Name")]
-        public string UserName { get; set; } = null!;
-
-        [Required]
         [StringLength(256, ErrorMessage = "Email must be less than or equals to 256 characters.")]
         [RegularExpression("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")]
         public string Email { get; set; } = null!;
@@ -31,6 +24,9 @@ namespace PracticalNineteen.Domain.DTO
         [MinLength(6)]
         [StringLength(128, ErrorMessage = "Password must be less than or equals to 128 characters.")]
         public string Password { get; set; } = null!;
+
+        [Compare("Password")]
+        public string ConfirmPassword { get; set; } = null!;
 
         [Required]
         [MinLength(10, ErrorMessage = "Mobile number must contains 10 digit only.")]

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PracticalNineteen.Domain.Entities
 {
-    public class UserIdentityModel : IdentityUser
+    public class UserIdentity : IdentityUser
     {
 
         [Required]

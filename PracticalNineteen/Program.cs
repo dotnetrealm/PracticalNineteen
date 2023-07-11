@@ -1,35 +1,13 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using PracticalNineteen.Data.Contexts;
-using PracticalNineteen.Data.Repositories;
-using PracticalNineteen.Domain.Entities;
-using PracticalNineteen.Domain.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-builder.Services.AddDbContext<ApplicationDBContext>(opt =>
+builder.Services.AddHttpClient("apiController", opt =>
 {
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opt.BaseAddress = new Uri(builder.Configuration.GetValue<string>("API_URL"));
 });
-
-builder.Services.AddIdentity<UserIdentityModel, IdentityRole>(opt =>
-                {
-                    opt.SignIn.RequireConfirmedEmail = false;
-
-                    opt.Password.RequiredUniqueChars = 0;
-                    opt.Password.RequireNonAlphanumeric = false;
-                    opt.Password.RequireDigit = false;
-                    opt.Password.RequireLowercase = false;
-                    opt.Password.RequireUppercase = false;
-                })
-                .AddEntityFrameworkStores<ApplicationDBContext>();
-
-builder.Services.AddScoped<IAccountRepository,AccountRepository>();
-builder.Services.AddScoped<IUserRepository,UsersRepository>();
 
 var app = builder.Build();
 
@@ -49,6 +27,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Register}/{id?}");
 
 app.Run();

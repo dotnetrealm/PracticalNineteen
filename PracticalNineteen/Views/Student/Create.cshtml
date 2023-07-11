@@ -1,0 +1,75 @@
+﻿@model PracticalNineteen.Domain.DTO.StudentModel;
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1 class="text-center">Add new student</h1>
+
+<hr />
+<div class="row d-flex justify-content-center">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mb-2">
+                <label asp-for="FirstName" class="control-label required"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="MiddleName" class="control-label"></label>
+                <input asp-for="MiddleName" class="form-control" />
+                <span asp-validation-for="MiddleName" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="LastName" class="control-label required"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="DOB" class="control-label required"></label>
+                <input class="form-control" asp-for="DOB" type="date" min="1800-01-01" max='@DateTime.Now.ToString("yyyy-MM-dd")' asp-format="{0:yyyy-MM-dd}">
+                <span asp-validation-for="DOB" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-2">
+                <label asp-for="Gender" class="control-label required"></label>
+                <div class="d-flex">
+                    <div class="form-check me-3">
+                        <input class="form-check-input" type="radio" asp-for="Gender" value="M" id="MaleRadio">
+                        <label class="form-check-label" for="MaleRadio">
+                            Male
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" asp-for="Gender" value="F" id="FemaleRadio">
+                        <label class="form-check-label" for="FemaleRadio">
+                            Female
+                        </label>
+                    </div>
+                </div>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="MobileNumber" class="control-label required"></label>
+                <input asp-for="MobileNumber" class="form-control" />
+                <span asp-validation-for="MobileNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="Address" class="control-label"></label>
+                <textarea class="form-control" asp-for="Address"></textarea>
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

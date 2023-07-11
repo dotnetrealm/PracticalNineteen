@@ -5,7 +5,6 @@ using System.Diagnostics;
 
 namespace PracticalNineteen.Controllers
 {
-    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

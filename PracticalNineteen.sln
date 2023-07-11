@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PracticalNineteen", "PracticalNineteen\PracticalNineteen.csproj", "{62C7E396-EB1F-4A47-83A0-D46636854F8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PracticalNineteen", "PracticalNineteen\PracticalNineteen.csproj", "{62C7E396-EB1F-4A47-83A0-D46636854F8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PracticalNineteen.Data", "PracticalNineteen.Data\PracticalNineteen.Data.csproj", "{73E81646-0B8F-4B8F-B4E3-46DEDC35AAD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PracticalNineteen.Data", "PracticalNineteen.Data\PracticalNineteen.Data.csproj", "{73E81646-0B8F-4B8F-B4E3-46DEDC35AAD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PracticalNineteen.Domain", "PracticalNineteen.Domain\PracticalNineteen.Domain.csproj", "{45C49C22-6A43-4576-A67D-E8CD8FA66368}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PracticalNineteen.Domain", "PracticalNineteen.Domain\PracticalNineteen.Domain.csproj", "{45C49C22-6A43-4576-A67D-E8CD8FA66368}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PracticalNineteen.API", "PracticalNineteen.API\PracticalNineteen.API.csproj", "{09563E89-336E-4172-96DF-589D065ED453}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{45C49C22-6A43-4576-A67D-E8CD8FA66368}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45C49C22-6A43-4576-A67D-E8CD8FA66368}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45C49C22-6A43-4576-A67D-E8CD8FA66368}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09563E89-336E-4172-96DF-589D065ED453}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09563E89-336E-4172-96DF-589D065ED453}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09563E89-336E-4172-96DF-589D065ED453}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09563E89-336E-4172-96DF-589D065ED453}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
