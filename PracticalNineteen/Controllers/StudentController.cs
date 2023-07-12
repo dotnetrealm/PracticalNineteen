@@ -11,7 +11,7 @@ namespace PracticalNineteen.MVC.Controllers
 
         public StudentController(IHttpClientFactory httpClient)
         {
-            _httpClient = httpClient.CreateClient("studentapi");
+            _httpClient = httpClient.CreateClient("api");
         }
 
         /// <summary>
@@ -21,7 +21,8 @@ namespace PracticalNineteen.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> IndexAsync()
         {
-            IEnumerable<StudentModel>? students = await _httpClient.GetFromJsonAsync<IEnumerable<StudentModel>>("students");
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6ImEzNjJjNDEyLWE2YWQtNDE5OS05NmYwLWU2MDJkMWQwZmRlOSIsImVtYWlsIjoiYmhhdmluQGdtYWlsLmNvbSIsIm5hbWUiOiJCaGF2aW4gS2FyZWxpeWEiLCJqdGkiOiJlMzFmMmYwOC1kMzYwLTRhNDMtOTIwYi1lN2M3NTZhYTQ2MjMiLCJpYXQiOjE2ODkxNjg5NDgsInJvbGUiOiJVc2VyLEFkbWluIiwibmJmIjoxNjg5MTY4OTQ4LCJleHAiOjE2ODkxNjkyNDh9.01Yd8quIji5s2FWjY-zFjT-nG-OdEFb6U1Yu2FLZOHY");
+            IEnumerable<StudentModel>? students = await _httpClient.GetFromJsonAsync<IEnumerable<StudentModel>>("Students");
             return View(students);
         }
 

@@ -61,7 +61,7 @@ namespace PracticalNineteen.Data.Repositories
             data.MobileNumber = student.MobileNumber;
             data.Address = student.Address;
             data.DOB = student.DOB;
-            data.Gender = student.Gender;
+            data.Gender = student.Gender; 
             _db.Students.Update(data);
             await _db.SaveChangesAsync();
             return true;

@@ -8,6 +8,8 @@ using PracticalNineteen.Domain.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PracticalNineteen.API.Controllers
 {
@@ -49,7 +51,7 @@ namespace PracticalNineteen.API.Controllers
         public async Task<IActionResult> AddUserToRole(string email, string role)
         {
             var res = await _accountRepository.AddUserToRoleAsync(email, role);
-            if (!res) return BadRequest(new { error = "User/Role does not exist" });
+            if (!res) return BadRequest(new ErrorModel { Error = "User/Role does not exist" });
 
             return Ok(new { result = "User has been added to the role." });
         }
@@ -65,9 +67,9 @@ namespace PracticalNineteen.API.Controllers
         public async Task<IActionResult> RemoveUserRole(string email, string role)
         {
             var res = await _accountRepository.RemoveUserFromRoleAsync(email, role);
-            if (!res) return BadRequest(new { error = "User/Role does not exist" });
+            if (!res) return BadRequest(new ErrorModel { Error = "User/Role does not exist" });
 
-            return Ok(new { result = "User has been removed from the role." });
+            return Ok(new ResponseModel{ Message = "User has been removed from the role." });
         }
 
         /// <summary>
@@ -80,7 +82,7 @@ namespace PracticalNineteen.API.Controllers
         public async Task<IActionResult> GetUserRoles(string email)
         {
             IEnumerable<string> roles = await _accountRepository.GetUserRolesAsync(email);
-            if (email is null) return BadRequest(new { error = "User not exist!" });
+            if (email is null) return BadRequest(new ErrorModel{ Error = "User not exist!" });
             return Ok(roles);
         }
 
@@ -93,23 +95,23 @@ namespace PracticalNineteen.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] UserRegistrationModel user)
         {
-            if (!ModelState.IsValid) return BadRequest(new { error = "Please enter valid user details" });
+            if (!ModelState.IsValid) return BadRequest(new ErrorModel { Error = "Please enter valid user details" });
 
             UserIdentity data = await _accountRepository.GetUserByEmailAsync(user.Email);
-            if (data is not null) return BadRequest(new { error = "User already exist!" });
+            if (data is not null) return BadRequest(new ErrorModel { Error = "User already exist!" });
 
             UserIdentity userIdentity = _mapper.Map<UserIdentity>(user);
             bool isSucceeded = await _accountRepository.RegisterUserAsync(userIdentity);
 
             if (isSucceeded)
             {
-                var roles = await _accountRepository.GetUserRolesAsync(user.Email); ;
+                var roles = await _accountRepository.GetUserRolesAsync(user.Email); 
                 string role = string.Join(",", roles);
                 var token = GenerateJWT(userIdentity, role);
-                return Ok(new { token = token });
+                return Ok(new ResponseModel{ Data = token });
             }
-            return BadRequest(new { error = "User already exist!" });
-        }
+            return BadRequest(new ErrorModel { Error = "User registration failed!" });
+          }
 
         /// <summary>
         /// Check given credentials and if it is valid than return token
@@ -120,18 +122,19 @@ namespace PracticalNineteen.API.Controllers
         [HttpPost]
         public async Task<IActionResult> LoginAsync([FromBody] CredentialModel creds)
         {
-            if (!ModelState.IsValid) return BadRequest(new { error = "Please enter valid details!!" });
+            if (!ModelState.IsValid) return BadRequest(new { Error = "Please enter valid details!!" });
 
             var user = await _accountRepository.GetUserByEmailAsync(creds.Email);
-            if (user is null) return BadRequest(new { error = "User not found!" });
+            if (user is null) return BadRequest(new { Error = "User not found!" });
 
             bool isCorrect = await _accountRepository.CheckUserCredsAsync(user, creds.Password);
-            if (!isCorrect) return BadRequest(new { error = "Invalid credentials!" });
+            if (!isCorrect) return BadRequest(new  { Error = "Invalid credentials!" });
 
-            var roles = await _accountRepository.GetUserRolesAsync(creds.Email); ;
+            var roles = await _accountRepository.GetUserRolesAsync(creds.Email);
             string role = string.Join(",", roles);
+
             string token = GenerateJWT(user, role);
-            return Ok(new { token = token });
+                       return Ok(new ResponseModel { Data= token});
         }
 
         /// <summary>
@@ -160,7 +163,7 @@ namespace PracticalNineteen.API.Controllers
             bool isSucceeded = await _accountRepository.CreateRoleAsync(name);
             if (isSucceeded)
                 return Ok(new { result = $"The role {name} has been added successfully" });
-            return BadRequest(new { error = $"The role {name} has not been added" });
+            return BadRequest(new ErrorModel { Error = $"The role {name} has not been added" });
         }
 
         /// <summary>

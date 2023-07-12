@@ -8,7 +8,7 @@ namespace PracticalNineteen.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class StudentsController : ControllerBase
     {
         private readonly IStudentRepository _studentRepository;
@@ -21,7 +21,6 @@ namespace PracticalNineteen.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllStudents()
         {
-
             IEnumerable<StudentModel> student = await _studentRepository.GetAllStudentsAsync();
             return Ok(student);
         }

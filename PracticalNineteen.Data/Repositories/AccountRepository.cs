@@ -10,7 +10,6 @@ namespace PracticalNineteen.Data.Repositories
     {
         readonly UserManager<UserIdentity> _userManager;
         readonly RoleManager<IdentityRole> _roleManager;
-        readonly SignInManager<UserIdentity> _signInManager;
         readonly ApplicationDBContext _db;
 
         public AccountRepository(
@@ -21,7 +20,6 @@ namespace PracticalNineteen.Data.Repositories
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _signInManager = signInManager;
             _db = db;
         }
 

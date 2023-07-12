@@ -10,18 +10,40 @@ using PracticalNineteen.Domain.Entities;
 using PracticalNineteen.Domain.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
+//Register DB Context
+builder.Services.AddDbContextPool<ApplicationDBContext>(opt =>
+{
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 
-//Add swagger services
-builder.Services.AddSwaggerGen();
+//JWT Authentication
+builder.Services.AddAuthentication(opt =>
+{
+    opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddCookie(x => { x.Cookie.Name = "token"; })
+.AddJwtBearer(jwt =>
+{
+    var key = builder.Configuration["Jwt:Key"];
+    jwt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        RequireExpirationTime = false,//updated when refresh token is added
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+    };
+});
 
-//For swagger authorization
-builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+builder.Services.AddAuthorization();
 
 //idntity user configurations
 builder.Services.AddIdentity<UserIdentity, IdentityRole>(opt =>
@@ -35,31 +57,11 @@ builder.Services.AddIdentity<UserIdentity, IdentityRole>(opt =>
                     })
                     .AddEntityFrameworkStores<ApplicationDBContext>();
 
-//JWT Authentication
-builder.Services.AddAuthentication(opt =>
-{
-    opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    opt.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(jwt =>
-{
-    var key = builder.Configuration["Jwt:Key"];
-    jwt.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        RequireExpirationTime = false,//updated when refresh token is added
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
-    };
+//Add swagger services
+builder.Services.AddSwaggerGen();
 
-    //after successfull authentication, add token inside header
-    jwt.SaveToken = true;
-});
-
-builder.Services.AddAuthorization();
+//For swagger authorization
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IUserRepository, UsersRepository>();
@@ -68,11 +70,9 @@ builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 //Register Automapper service
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-//Register DB Context
-builder.Services.AddDbContextPool<ApplicationDBContext>(opt =>
-{
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+// Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
@@ -85,6 +85,7 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler("/Error");
 
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
