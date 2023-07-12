@@ -60,7 +60,7 @@ namespace PracticalNineteen.API.Controllers
         /// <param name="email"></param>
         /// <param name="role">name of role</param>
         /// <returns></returns>
-        [Route("RemoveUserToRole")]
+        [Route("RemoveUserFromRole")]
         [HttpPost]
         public async Task<IActionResult> RemoveUserRole(string email, string role)
         {
@@ -103,7 +103,9 @@ namespace PracticalNineteen.API.Controllers
 
             if (isSucceeded)
             {
-                var token = GenerateJWT(userIdentity);
+                var roles = await _accountRepository.GetUserRolesAsync(user.Email); ;
+                string role = string.Join(",", roles);
+                var token = GenerateJWT(userIdentity, role);
                 return Ok(new { token = token });
             }
             return BadRequest(new { error = "User already exist!" });
@@ -126,7 +128,9 @@ namespace PracticalNineteen.API.Controllers
             bool isCorrect = await _accountRepository.CheckUserCredsAsync(user, creds.Password);
             if (!isCorrect) return BadRequest(new { error = "Invalid credentials!" });
 
-            string token = GenerateJWT(user);
+            var roles = await _accountRepository.GetUserRolesAsync(creds.Email); ;
+            string role = string.Join(",", roles);
+            string token = GenerateJWT(user, role);
             return Ok(new { token = token });
         }
 
@@ -139,7 +143,8 @@ namespace PracticalNineteen.API.Controllers
         public async Task<IActionResult> GetAllRoles()
         {
             IEnumerable<IdentityRole> roles = await _accountRepository.GetAllRolesAsync();
-            return Ok(roles);
+            List<string> roleList = roles.Select(x => x.Name).ToList();
+            return Ok(roleList);
         }
 
         /// <summary>
@@ -158,23 +163,12 @@ namespace PracticalNineteen.API.Controllers
             return BadRequest(new { error = $"The role {name} has not been added" });
         }
 
-        //[Route("Login")]
-        //[HttpPost]
-        //public async Task<IActionResult> LoginAsync(UserCredential user)
-        //{
-        //    if (!ModelState.IsValid) return BadRequest(user);
-        //    var isValid = await _accountRepository.GetUserByUsernamePassword(user.UserName, user.Password);
-        //    if (!isValid) return StatusCode(401, "Invalid username/password.");
-        //    //var token = GenerateJWT();
-        //    return Ok();
-        //}
-
         /// <summary>
         /// create new JWT token
         /// </summary>
         /// <param name="claims"></param>
         /// <returns></returns>
-        private string GenerateJWT(UserIdentity user)
+        private string GenerateJWT(UserIdentity user, string roles)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!);
@@ -186,7 +180,8 @@ namespace PracticalNineteen.API.Controllers
                     new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                     new Claim(JwtRegisteredClaimNames.Name, $"{user.FirstName} {user.LastName}"),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), //JWT Token Id
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToUniversalTime().ToString()) //time at which JWT issued
+                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToUniversalTime().ToString()), //time at which JWT issued
+                    new Claim(ClaimTypes.Role , roles)
                 }),
                 Expires = DateTime.Now.AddMinutes(5),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)

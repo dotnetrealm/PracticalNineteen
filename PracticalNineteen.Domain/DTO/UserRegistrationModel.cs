@@ -33,5 +33,7 @@ namespace PracticalNineteen.Domain.DTO
         [MaxLength(10, ErrorMessage = "Mobile number must contains 10 digit only.")]
         [RegularExpression("^[0-9]{10}$", ErrorMessage = "Please enter valid mobile number.")]
         public string PhoneNumber { get; set; } = null!;
+
+        public string Role { get; set; }
     }
 }

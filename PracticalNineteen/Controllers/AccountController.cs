@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using PracticalNineteen.Domain.DTO;
 using PracticalNineteen.Domain.Entities;
 
@@ -9,18 +10,21 @@ namespace PracticalNineteen.Controllers
         readonly HttpClient _httpClient;
         public AccountController(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClientFactory.CreateClient("apiController");
+            _httpClient = httpClientFactory.CreateClient("api");
         }
         [HttpGet]
-        public IActionResult Register()
+        public async Task<IActionResult> RegisterAsync()
         {
+            var roles = await _httpClient.GetFromJsonAsync<IEnumerable<string>>("Identity/Roles");
+            ViewBag.Roles = new SelectList(roles, roles);
             return View(new UserRegistrationModel());
         }
 
         [HttpPost]
         public async Task<IActionResult> RegisterAsync(UserIdentity user)
         {
-            var token =await _httpClient.PostAsJsonAsync("Identity/Register", user);
+            if (!ModelState.IsValid) return View(user);
+            var token = await _httpClient.PostAsJsonAsync("Identity/Register", user);
             if (token is not null)
                 return Redirect("/Student/Index");
             ModelState.AddModelError(String.Empty, "Invalid Credentials");

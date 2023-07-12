@@ -8,7 +8,7 @@ namespace PracticalNineteen.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     public class StudentsController : ControllerBase
     {
         private readonly IStudentRepository _studentRepository;
@@ -33,6 +33,7 @@ namespace PracticalNineteen.Controllers
             return Ok(student);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody] StudentModel student)
         {
@@ -46,7 +47,7 @@ namespace PracticalNineteen.Controllers
             return BadRequest(ModelState);
         }
 
-        // PUT api/<StudentController>/5
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync(int id, [FromBody] StudentModel student)
         {
@@ -57,7 +58,7 @@ namespace PracticalNineteen.Controllers
             return Ok(student);
         }
 
-        // DELETE api/<StudentController>/5
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

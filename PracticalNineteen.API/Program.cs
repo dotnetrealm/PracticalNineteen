@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using PracticalNineteen.API.Swagger;
 using PracticalNineteen.Data.Contexts;
 using PracticalNineteen.Data.Repositories;
 using PracticalNineteen.Domain.Entities;
 using PracticalNineteen.Domain.Interfaces;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +16,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+//Add swagger services
 builder.Services.AddSwaggerGen();
+
+//For swagger authorization
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
+//idntity user configurations
 builder.Services.AddIdentity<UserIdentity, IdentityRole>(opt =>
                     {
                         opt.SignIn.RequireConfirmedEmail = false;
@@ -25,6 +35,7 @@ builder.Services.AddIdentity<UserIdentity, IdentityRole>(opt =>
                     })
                     .AddEntityFrameworkStores<ApplicationDBContext>();
 
+//JWT Authentication
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -44,7 +55,7 @@ builder.Services.AddAuthentication(opt =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
     };
 
-    //after successfull authentication, then add token inside header
+    //after successfull authentication, add token inside header
     jwt.SaveToken = true;
 });
 
@@ -54,19 +65,16 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IUserRepository, UsersRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 
+//Register Automapper service
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+//Register DB Context
 builder.Services.AddDbContextPool<ApplicationDBContext>(opt =>
 {
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 var app = builder.Build();
-
-app.Use(async (context, next) =>
-{
-    Console.WriteLine(context);
-    await next();
-});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
