@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PracticalNineteen.Domain.DTO;
 using System.Net;
 
 namespace PracticalNineteen.MVC.Controllers
 {
+    [Authorize]
     public class StudentController : Controller
     {
         //HTTP Client
@@ -12,6 +14,7 @@ namespace PracticalNineteen.MVC.Controllers
         public StudentController(IHttpClientFactory httpClient)
         {
             _httpClient = httpClient.CreateClient("api");
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6ImEzNjJjNDEyLWE2YWQtNDE5OS05NmYwLWU2MDJkMWQwZmRlOSIsImVtYWlsIjoiYmhhdmluQGdtYWlsLmNvbSIsIm5hbWUiOiJCaGF2aW4gS2FyZWxpeWEiLCJqdGkiOiIwNmJkZGU2Ny01ZDM2LTQ4OWEtOWMzYS1mMmQ3MzdhMGZmOWYiLCJpYXQiOjE2ODkyMzk0NzksInJvbGUiOiJBZG1pbiIsIm5iZiI6MTY4OTIzOTQ3OSwiZXhwIjoxNjg5NjcxNDc5fQ.DNG6F7Dmvtwv_gP5A8Yve1KzGKBawV4PlIMwzEKsUI4");
         }
 
         /// <summary>
@@ -21,7 +24,6 @@ namespace PracticalNineteen.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> IndexAsync()
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6ImEzNjJjNDEyLWE2YWQtNDE5OS05NmYwLWU2MDJkMWQwZmRlOSIsImVtYWlsIjoiYmhhdmluQGdtYWlsLmNvbSIsIm5hbWUiOiJCaGF2aW4gS2FyZWxpeWEiLCJqdGkiOiJlMzFmMmYwOC1kMzYwLTRhNDMtOTIwYi1lN2M3NTZhYTQ2MjMiLCJpYXQiOjE2ODkxNjg5NDgsInJvbGUiOiJVc2VyLEFkbWluIiwibmJmIjoxNjg5MTY4OTQ4LCJleHAiOjE2ODkxNjkyNDh9.01Yd8quIji5s2FWjY-zFjT-nG-OdEFb6U1Yu2FLZOHY");
             IEnumerable<StudentModel>? students = await _httpClient.GetFromJsonAsync<IEnumerable<StudentModel>>("Students");
             return View(students);
         }
@@ -44,6 +46,7 @@ namespace PracticalNineteen.MVC.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View(new StudentModel());
@@ -55,6 +58,7 @@ namespace PracticalNineteen.MVC.Controllers
         /// <param name="student"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateAsync(StudentModel student)
         {
             //future date validation
@@ -84,6 +88,7 @@ namespace PracticalNineteen.MVC.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditAsync(int id)
         {
             StudentModel? student = await _httpClient.GetFromJsonAsync<StudentModel>($"Students/{id}");
@@ -98,13 +103,14 @@ namespace PracticalNineteen.MVC.Controllers
         /// <param name="student"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditAsync(int id, StudentModel student)
         {
             if (student.DOB > DateTime.Now) ModelState.AddModelError(nameof(StudentModel.DOB), $"Please enter a value less than or equal to {DateTime.Now.ToShortDateString()}.");
             if (!ModelState.IsValid) return View(student);
 
             HttpResponseMessage response = await _httpClient.PutAsJsonAsync<StudentModel>($"Students/{id}", student);
-            if (response.IsSuccessStatusCode) return RedirectToAction("Error", "Home");
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error", "Home");
             return RedirectToAction("Index");
         }
 
@@ -114,6 +120,7 @@ namespace PracticalNineteen.MVC.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var res = await _httpClient.DeleteAsync($"Students/{id}");

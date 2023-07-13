@@ -38,7 +38,7 @@ namespace PracticalNineteen.Domain.Interfaces
         /// </summary>
         /// <param name="user">UserModel object</param>
         /// <returns>true if created successfully, else false</returns>
-        Task<bool> RegisterUserAsync(UserIdentity userIdentity);
+        Task<bool> RegisterUserAsync(UserIdentity userIdentity, string password);
 
         /// <summary>
         /// Create new role

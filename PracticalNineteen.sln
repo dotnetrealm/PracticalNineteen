@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PracticalNineteen.Data", "P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PracticalNineteen.Domain", "PracticalNineteen.Domain\PracticalNineteen.Domain.csproj", "{45C49C22-6A43-4576-A67D-E8CD8FA66368}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PracticalNineteen.API", "PracticalNineteen.API\PracticalNineteen.API.csproj", "{09563E89-336E-4172-96DF-589D065ED453}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PracticalNineteen.API", "PracticalNineteen.API\PracticalNineteen.API.csproj", "{09563E89-336E-4172-96DF-589D065ED453}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

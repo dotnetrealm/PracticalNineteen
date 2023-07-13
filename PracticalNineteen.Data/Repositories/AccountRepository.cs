@@ -63,13 +63,12 @@ namespace PracticalNineteen.Data.Repositories
             return roles;
         }
 
-        public async Task<bool> RegisterUserAsync(UserIdentity userIdentity)
+        public async Task<bool> RegisterUserAsync(UserIdentity userIdentity, string password)
         {
             var existingUser = await _userManager.FindByEmailAsync(userIdentity.Email);
             if (existingUser != null) return false;
-
             userIdentity.UserName = userIdentity.Email;
-            var res = await _userManager.CreateAsync(userIdentity);
+            var res = await _userManager.CreateAsync(userIdentity, password);
             if (res.Succeeded)
             {
                 var roleRes = await _userManager.AddToRoleAsync(userIdentity, "User");

@@ -10,7 +10,6 @@ using PracticalNineteen.Domain.Entities;
 using PracticalNineteen.Domain.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +38,8 @@ builder.Services.AddAuthentication(opt =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         RequireExpirationTime = false,//updated when refresh token is added
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+        ClockSkew = TimeSpan.Zero,
     };
 });
 
@@ -76,6 +76,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
+builder.Services.AddCors();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -85,6 +87,11 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler("/Error");
 
 app.UseHttpsRedirection();
+
+app.Use(async (context, next) =>
+{
+    await next();
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

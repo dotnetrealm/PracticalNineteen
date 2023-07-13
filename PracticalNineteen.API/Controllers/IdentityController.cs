@@ -8,8 +8,6 @@ using PracticalNineteen.Domain.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PracticalNineteen.API.Controllers
 {
@@ -69,7 +67,7 @@ namespace PracticalNineteen.API.Controllers
             var res = await _accountRepository.RemoveUserFromRoleAsync(email, role);
             if (!res) return BadRequest(new ErrorModel { Error = "User/Role does not exist" });
 
-            return Ok(new ResponseModel{ Message = "User has been removed from the role." });
+            return Ok(new ResponseModel { Message = "User has been removed from the role." });
         }
 
         /// <summary>
@@ -82,7 +80,7 @@ namespace PracticalNineteen.API.Controllers
         public async Task<IActionResult> GetUserRoles(string email)
         {
             IEnumerable<string> roles = await _accountRepository.GetUserRolesAsync(email);
-            if (email is null) return BadRequest(new ErrorModel{ Error = "User not exist!" });
+            if (email is null) return BadRequest(new ErrorModel { Error = "User not exist!" });
             return Ok(roles);
         }
 
@@ -94,24 +92,24 @@ namespace PracticalNineteen.API.Controllers
         [Route("Register")]
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] UserRegistrationModel user)
-        {
+        { 
             if (!ModelState.IsValid) return BadRequest(new ErrorModel { Error = "Please enter valid user details" });
 
             UserIdentity data = await _accountRepository.GetUserByEmailAsync(user.Email);
             if (data is not null) return BadRequest(new ErrorModel { Error = "User already exist!" });
 
             UserIdentity userIdentity = _mapper.Map<UserIdentity>(user);
-            bool isSucceeded = await _accountRepository.RegisterUserAsync(userIdentity);
+            bool isSucceeded = await _accountRepository.RegisterUserAsync(userIdentity, user.Password);
 
             if (isSucceeded)
             {
-                var roles = await _accountRepository.GetUserRolesAsync(user.Email); 
+                var roles = await _accountRepository.GetUserRolesAsync(user.Email);
                 string role = string.Join(",", roles);
                 var token = GenerateJWT(userIdentity, role);
-                return Ok(new ResponseModel{ Data = token });
+                return Ok(new ResponseModel { Data = token });
             }
             return BadRequest(new ErrorModel { Error = "User registration failed!" });
-          }
+        }
 
         /// <summary>
         /// Check given credentials and if it is valid than return token
@@ -128,13 +126,13 @@ namespace PracticalNineteen.API.Controllers
             if (user is null) return BadRequest(new { Error = "User not found!" });
 
             bool isCorrect = await _accountRepository.CheckUserCredsAsync(user, creds.Password);
-            if (!isCorrect) return BadRequest(new  { Error = "Invalid credentials!" });
+            if (!isCorrect) return BadRequest(new { Error = "Invalid credentials!" });
 
             var roles = await _accountRepository.GetUserRolesAsync(creds.Email);
             string role = string.Join(",", roles);
 
             string token = GenerateJWT(user, role);
-                       return Ok(new ResponseModel { Data= token});
+            return Ok(new ResponseModel { Data = token, UserInfo = new UserInformation(user.Id, user.FirstName, user.LastName, role) });
         }
 
         /// <summary>
@@ -186,7 +184,7 @@ namespace PracticalNineteen.API.Controllers
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToUniversalTime().ToString()), //time at which JWT issued
                     new Claim(ClaimTypes.Role , roles)
                 }),
-                Expires = DateTime.Now.AddMinutes(5),
+                Expires = DateTime.Now.AddDays(5),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
             var token = jwtTokenHandler.CreateToken(tokenDescriptor);

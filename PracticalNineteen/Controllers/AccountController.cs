@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NuGet.Common;
 using PracticalNineteen.Domain.DTO;
+using System.Net;
+using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PracticalNineteen.Controllers
 {
@@ -45,53 +49,73 @@ namespace PracticalNineteen.Controllers
             }
 
             ErrorModel resMessage = await res.Content.ReadFromJsonAsync<ErrorModel>();
-            ModelState.AddModelError(String.Empty, resMessage.Error);
+            ModelState.AddModelError(string.Empty, resMessage.Error);
             return View(user);
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Login(string? returnUrl)
         {
-            //if (_signInManager.IsSignedIn(User))
-            //{
-            //    return RedirectToAction("Index", "Home");
-            //}
+            ViewBag.ReturnUrl = returnUrl;
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Student");
+            }
             return View(new CredentialModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(CredentialModel creds)
+        public async Task<IActionResult> Login(CredentialModel creds, string? returnUrl)
         {
             if (ModelState.IsValid)
             {
                 var res = await _httpClient.PostAsJsonAsync<CredentialModel>("identity/login", creds);
-                
-                if (res.IsSuccessStatusCode)
-                {
-                    ResponseModel data = await res.Content.ReadFromJsonAsync<ResponseModel>();
-                    HttpContext.Response.Cookies.Append("token", data.Data, new CookieOptions
-                    {
-                        Expires = DateTime.Now.AddDays(7),
-                        Secure = true,
-                        IsEssential = true,
-                        HttpOnly = true,
-                        SameSite = SameSiteMode.None
-                    });
-                    return RedirectToAction("Index", "Student");
-                }
-                else
+
+                if (!res.IsSuccessStatusCode)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid UserName/Password.");
                     return View(creds);
                 }
+
+                ResponseModel data = await res.Content.ReadFromJsonAsync<ResponseModel>();
+                HttpContext.Response.Cookies.Append("token", data.Data, new CookieOptions
+                {
+                    Expires = DateTime.Now.AddHours(7),
+                    Secure = true,
+                    IsEssential = true,
+                    HttpOnly = false,
+                    SameSite = SameSiteMode.None
+                });
+
+                List<Claim> claims = new List<Claim>() {
+                                        new Claim(ClaimTypes.Email, creds.Email),
+                                        new Claim(ClaimTypes.Name, data.UserInfo.FirstName + " " + data.UserInfo.LastName),
+                                        new Claim(ClaimTypes.Role, data.UserInfo.Role),
+                                        new Claim("UserId", data.UserInfo.UserId.ToString())
+                                    };
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "AccountCookie");
+                ClaimsPrincipal principal = new ClaimsPrincipal(claimsIdentity);
+                AuthenticationProperties properties = new AuthenticationProperties
+                {
+                    IsPersistent = creds.RememberMe,
+                };
+                await HttpContext.SignInAsync("AccountCookie", principal, properties);
+
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
+
+                return RedirectToAction("Index", "Student");
             }
             return View(creds);
         }
 
-        //public async Task<IActionResult> LogoutAsync()
-        //{
-        //    await _signInManager.SignOutAsync();
-        //    return RedirectToAction("Login", "Account");
-        //}
+        public IActionResult PageNotFound()
+        {
+            return View();
+        }
+        public async Task<IActionResult> LogoutAsync()
+        {
+            await HttpContext.SignOutAsync("AccountCookie");
+            return RedirectToAction("Login", "Account");
+        }
     }
 }
