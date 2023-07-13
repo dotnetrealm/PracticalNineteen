@@ -67,5 +67,12 @@ namespace PracticalNineteen.Domain.Interfaces
         /// <param name="email"></param>
         /// <returns></returns>
         Task<UserIdentity> GetUserByEmailAsync(string email);
+
+        /// <summary>
+        /// Delete user 
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        Task<bool> DeleteUserAsync(string email);
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace PracticalNineteen.Domain.DTO
+﻿namespace PracticalNineteen.Domain.DTO
 {
     public class ErrorModel
     {

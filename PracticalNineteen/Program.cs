@@ -7,25 +7,23 @@ builder.Services.AddHttpClient("api", (client) =>
     client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("API_URL"));
 });
 
-builder.Services.AddAuthentication("AccountCookie").AddCookie("AccountCookie", opt => {
+builder.Services.AddAuthentication("AccountCookie").AddCookie("AccountCookie", opt =>
+{
     opt.Cookie.Name = "AccountCookie";
     opt.ExpireTimeSpan = TimeSpan.FromMinutes(10);
 });
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("Error");
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
-app.Use(async (context, next) =>
-{
-    await next();
-});
-
-app.UseStatusCodePagesWithReExecute("Account/PageNotFound");
+app.UseStatusCodePagesWithReExecute("/Account/PageNotFound");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

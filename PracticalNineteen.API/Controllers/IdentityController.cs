@@ -92,7 +92,7 @@ namespace PracticalNineteen.API.Controllers
         [Route("Register")]
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] UserRegistrationModel user)
-        { 
+        {
             if (!ModelState.IsValid) return BadRequest(new ErrorModel { Error = "Please enter valid user details" });
 
             UserIdentity data = await _accountRepository.GetUserByEmailAsync(user.Email);
@@ -162,6 +162,16 @@ namespace PracticalNineteen.API.Controllers
             if (isSucceeded)
                 return Ok(new { result = $"The role {name} has been added successfully" });
             return BadRequest(new ErrorModel { Error = $"The role {name} has not been added" });
+        }
+
+        [Route("DeleteUser")]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUser(string email)
+        {
+            var res = await _accountRepository.DeleteUserAsync(email);
+            if (!res) return BadRequest(new ErrorModel { Error = "User not exist" });
+
+            return Ok(new ResponseModel { Message = "User has been deleted." });
         }
 
         /// <summary>

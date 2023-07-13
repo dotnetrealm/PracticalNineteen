@@ -101,5 +101,14 @@ namespace PracticalNineteen.Data.Repositories
             return res;
         }
 
+        public async Task<bool> DeleteUserAsync(string email)
+        {
+            var existingUser = await _userManager.FindByEmailAsync(email);
+            if (existingUser == null) return false;
+            var res = await _userManager.DeleteAsync(existingUser);
+            if (res.Succeeded) return true;
+            return false;
+        }
+
     }
 }

@@ -11,10 +11,12 @@ namespace PracticalNineteen.MVC.Controllers
         //HTTP Client
         readonly HttpClient _httpClient;
 
-        public StudentController(IHttpClientFactory httpClient)
+        public StudentController(IHttpClientFactory httpClient, IHttpContextAccessor accessor)
         {
             _httpClient = httpClient.CreateClient("api");
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6ImEzNjJjNDEyLWE2YWQtNDE5OS05NmYwLWU2MDJkMWQwZmRlOSIsImVtYWlsIjoiYmhhdmluQGdtYWlsLmNvbSIsIm5hbWUiOiJCaGF2aW4gS2FyZWxpeWEiLCJqdGkiOiIwNmJkZGU2Ny01ZDM2LTQ4OWEtOWMzYS1mMmQ3MzdhMGZmOWYiLCJpYXQiOjE2ODkyMzk0NzksInJvbGUiOiJBZG1pbiIsIm5iZiI6MTY4OTIzOTQ3OSwiZXhwIjoxNjg5NjcxNDc5fQ.DNG6F7Dmvtwv_gP5A8Yve1KzGKBawV4PlIMwzEKsUI4");
+            var token = accessor.HttpContext?.User.Claims.FirstOrDefault(e => e.Type == "Token")?.Value;
+            if (token is not null) _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
         }
 
         /// <summary>
@@ -120,7 +122,7 @@ namespace PracticalNineteen.MVC.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var res = await _httpClient.DeleteAsync($"Students/{id}");

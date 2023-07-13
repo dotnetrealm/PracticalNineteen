@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using NuGet.Common;
 using PracticalNineteen.Domain.DTO;
-using System.Net;
 using System.Security.Claims;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PracticalNineteen.Controllers
 {
@@ -91,7 +88,8 @@ namespace PracticalNineteen.Controllers
                                         new Claim(ClaimTypes.Email, creds.Email),
                                         new Claim(ClaimTypes.Name, data.UserInfo.FirstName + " " + data.UserInfo.LastName),
                                         new Claim(ClaimTypes.Role, data.UserInfo.Role),
-                                        new Claim("UserId", data.UserInfo.UserId.ToString())
+                                        new Claim("UserId", data.UserInfo.UserId.ToString()),
+                                        new Claim("Token", data.Data)
                                     };
                 ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "AccountCookie");
                 ClaimsPrincipal principal = new ClaimsPrincipal(claimsIdentity);
@@ -112,6 +110,7 @@ namespace PracticalNineteen.Controllers
         {
             return View();
         }
+
         public async Task<IActionResult> LogoutAsync()
         {
             await HttpContext.SignOutAsync("AccountCookie");

@@ -32,8 +32,8 @@ builder.Services.AddAuthentication(opt =>
     var key = builder.Configuration["Jwt:Key"];
     jwt.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
+        ValidateIssuer = true,
+        ValidateAudience = true,
         ValidateLifetime = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
@@ -87,11 +87,6 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler("/Error");
 
 app.UseHttpsRedirection();
-
-app.Use(async (context, next) =>
-{
-    await next();
-});
 
 app.UseAuthentication();
 app.UseAuthorization();
