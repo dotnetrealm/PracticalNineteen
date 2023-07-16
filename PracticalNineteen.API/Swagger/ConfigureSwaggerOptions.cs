@@ -6,6 +6,9 @@ namespace PracticalNineteen.API.Swagger
 {
     public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
     {
+        /// <summary>
+        /// Provide input for add JWT token to access authorize routes
+        /// </summary>
         public void Configure(SwaggerGenOptions options)
         {
             options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme

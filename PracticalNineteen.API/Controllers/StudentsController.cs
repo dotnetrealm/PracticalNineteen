@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PracticalNineteen.Domain.DTO;
 using PracticalNineteen.Domain.Interfaces;
@@ -8,7 +7,7 @@ namespace PracticalNineteen.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = "JwtAuth")]
     public class StudentsController : ControllerBase
     {
         private readonly IStudentRepository _studentRepository;
@@ -32,7 +31,7 @@ namespace PracticalNineteen.Controllers
             return Ok(student);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody] StudentModel student)
         {
@@ -46,7 +45,7 @@ namespace PracticalNineteen.Controllers
             return BadRequest(ModelState);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync(int id, [FromBody] StudentModel student)
         {
@@ -57,7 +56,7 @@ namespace PracticalNineteen.Controllers
             return Ok(student);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -20,30 +19,21 @@ builder.Services.AddDbContextPool<ApplicationDBContext>(opt =>
 });
 
 //JWT Authentication
-builder.Services.AddAuthentication(opt =>
-{
-    opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    opt.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddCookie(x => { x.Cookie.Name = "token"; })
-.AddJwtBearer(jwt =>
+builder.Services.AddAuthentication("JwtAuth")
+.AddJwtBearer("JwtAuth", options =>
 {
     var key = builder.Configuration["Jwt:Key"];
-    jwt.TokenValidationParameters = new TokenValidationParameters
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        RequireExpirationTime = false,//updated when refresh token is added
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
         ClockSkew = TimeSpan.Zero,
     };
 });
-
-builder.Services.AddAuthorization();
 
 //idntity user configurations
 builder.Services.AddIdentity<UserIdentity, IdentityRole>(opt =>

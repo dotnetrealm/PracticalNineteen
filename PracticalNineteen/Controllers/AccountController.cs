@@ -53,6 +53,7 @@ namespace PracticalNineteen.Controllers
         [HttpGet]
         public IActionResult Login(string? returnUrl)
         {
+            throw new Exception();
             ViewBag.ReturnUrl = returnUrl;
             if (User.Identity.IsAuthenticated)
             {
@@ -64,6 +65,7 @@ namespace PracticalNineteen.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(CredentialModel creds, string? returnUrl)
         {
+
             if (ModelState.IsValid)
             {
                 var res = await _httpClient.PostAsJsonAsync<CredentialModel>("identity/login", creds);
@@ -107,6 +109,11 @@ namespace PracticalNineteen.Controllers
         }
 
         public IActionResult PageNotFound()
+        {
+            return View();
+        }
+
+        public IActionResult AccessDenied()
         {
             return View();
         }

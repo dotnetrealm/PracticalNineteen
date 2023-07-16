@@ -3,12 +3,11 @@
 @{
     ViewData["Title"] = "Register";
 }
-
-<h1 class="d-block">Registration Form</h1>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="row d-flex justify-content-center align-items-center">
+    <div class="col-md-6">
         <form asp-action="Register">
+            <h1 class="d-block my-3">Registration Form</h1>
+            <hr />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label required"></label>
@@ -45,8 +44,13 @@
                 <select asp-for="Role" class="form-control" asp-items="@ViewBag.Roles"></select>
                 <span asp-validation-for="Role" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <input type="submit" value="Register" class="btn btn-primary" />
+
+                <div class="d-flex align-items-baseline">
+                    <h6>Already registered?</h6>
+                    <a class="btn btn-link" asp-controller="Account" asp-action="Login">Go to Login</a>
+                </div>
             </div>
         </form>
     </div>

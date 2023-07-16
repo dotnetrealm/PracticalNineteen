@@ -26,6 +26,7 @@ namespace PracticalNineteen.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> IndexAsync()
         {
+            throw new Exception();
             IEnumerable<StudentModel>? students = await _httpClient.GetFromJsonAsync<IEnumerable<StudentModel>>("Students");
             return View(students);
         }

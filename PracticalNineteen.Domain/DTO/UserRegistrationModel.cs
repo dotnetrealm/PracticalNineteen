@@ -22,10 +22,12 @@ namespace PracticalNineteen.Domain.DTO
 
         [Required]
         [MinLength(6)]
+        [DataType(DataType.Password)]
         [StringLength(128, ErrorMessage = "Password must be less than or equals to 128 characters.")]
         public string Password { get; set; } = null!;
 
         [Compare("Password")]
+        [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; } = null!;
 
         [Required]

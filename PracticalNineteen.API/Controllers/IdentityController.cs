@@ -186,6 +186,8 @@ namespace PracticalNineteen.API.Controllers
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
+                Issuer = _configuration.GetValue<string>("Jwt:Issuer"),
+                Audience = _configuration.GetValue<string>("Jwt:Audience"),
                 Subject = new ClaimsIdentity(new List<Claim>() {
                     new Claim("Id", user.Id),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email!),

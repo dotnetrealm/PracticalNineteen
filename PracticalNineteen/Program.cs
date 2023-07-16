@@ -11,6 +11,7 @@ builder.Services.AddAuthentication("AccountCookie").AddCookie("AccountCookie", o
 {
     opt.Cookie.Name = "AccountCookie";
     opt.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+    opt.AccessDeniedPath = "/Account/AccessDenied";
 });
 
 builder.Services.AddHttpContextAccessor();
@@ -19,7 +20,7 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler("/Error/Index");
     app.UseHsts();
 }
 
