@@ -26,7 +26,6 @@ namespace PracticalNineteen.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> IndexAsync()
         {
-            throw new Exception();
             IEnumerable<StudentModel>? students = await _httpClient.GetFromJsonAsync<IEnumerable<StudentModel>>("Students");
             return View(students);
         }
@@ -62,6 +61,7 @@ namespace PracticalNineteen.MVC.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateAsync(StudentModel student)
         {
             //future date validation
@@ -107,6 +107,7 @@ namespace PracticalNineteen.MVC.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditAsync(int id, StudentModel student)
         {
             if (student.DOB > DateTime.Now) ModelState.AddModelError(nameof(StudentModel.DOB), $"Please enter a value less than or equal to {DateTime.Now.ToShortDateString()}.");

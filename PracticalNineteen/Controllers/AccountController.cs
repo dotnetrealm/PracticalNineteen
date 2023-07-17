@@ -13,6 +13,7 @@ namespace PracticalNineteen.Controllers
         {
             _httpClient = httpClientFactory.CreateClient("api");
         }
+
         [HttpGet]
         public async Task<IActionResult> RegisterAsync()
         {
@@ -22,6 +23,7 @@ namespace PracticalNineteen.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterAsync(UserRegistrationModel user)
         {
             IEnumerable<string> roles = await _httpClient.GetFromJsonAsync<IEnumerable<string>>("identity/roles");
@@ -53,7 +55,6 @@ namespace PracticalNineteen.Controllers
         [HttpGet]
         public IActionResult Login(string? returnUrl)
         {
-            throw new Exception();
             ViewBag.ReturnUrl = returnUrl;
             if (User.Identity.IsAuthenticated)
             {
@@ -63,9 +64,9 @@ namespace PracticalNineteen.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(CredentialModel creds, string? returnUrl)
         {
-
             if (ModelState.IsValid)
             {
                 var res = await _httpClient.PostAsJsonAsync<CredentialModel>("identity/login", creds);

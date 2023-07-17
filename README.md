@@ -19,6 +19,14 @@ ASP.NET Core Identity
 }
 ```
 
+- Add connection string in the user secrets file of PracticalNineteen project
+
+```json
+{
+  "API_URL": "https://localhost:44362/api/"
+}
+```
+
 > **_NOTE:_** This configuration only works under "Development" enviorment.
 
 ## Migration
