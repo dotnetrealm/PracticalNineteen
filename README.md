@@ -4,7 +4,7 @@ ASP.NET Core Identity
 
 ## Setup
 
-- Add connection string in the user secrets file of PracticalNineteen.API project
+- Add below configurations in the user secrets file of PracticalNineteen.API project
 
 ```json
 {
@@ -19,7 +19,7 @@ ASP.NET Core Identity
 }
 ```
 
-- Add connection string in the user secrets file of PracticalNineteen project
+- Add below configurations in the user secrets file of PracticalNineteen project
 
 ```json
 {
